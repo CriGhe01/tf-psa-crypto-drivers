@@ -5,6 +5,7 @@
  *
  */
 
+#include <assert.h>
 #include "cc3xx_test_hash.h"
 #include "test_lowlevel_hash.h"
 #ifndef CC3XX_CONFIG_FILE
@@ -157,6 +158,9 @@ uint8_t *output_from_alg_and_data(cc3xx_hash_alg_t alg,
         return data->output.sha224;
     case CC3XX_HASH_ALG_SHA1:
         return data->output.sha1;
+    default:
+        assert(0);
+        return NULL;
     }
 
     return NULL;
@@ -171,6 +175,9 @@ size_t hash_size_from_alg(cc3xx_hash_alg_t alg)
         return SHA224_OUTPUT_SIZE;
     case CC3XX_HASH_ALG_SHA1:
         return SHA1_OUTPUT_SIZE;
+    default:
+        assert(0);
+        return 0;
     }
 
     return 0;
@@ -275,7 +282,7 @@ void add_cc3xx_hash_tests_to_testsuite(struct test_suite_t *p_ts, uint32_t ts_si
 {
 #ifdef CC3XX_CONFIG_HASH_SHA256_ENABLE
     cc3xx_add_tests_to_testsuite(&hash_CC3XX_HASH_ALG_SHA256_tests, 1, p_ts, ts_size);
-    cc3xx_add_tests_to_testsuite(&hmac_tests_sha_256, ARRAY_SIZE(hmac_tests_sha_256), p_ts, ts_size);
+    cc3xx_add_tests_to_testsuite(hmac_tests_sha_256, ARRAY_SIZE(hmac_tests_sha_256), p_ts, ts_size);
 #endif /* CC3XX_CONFIG_HASH_SHA256_ENABLE */
 
 #ifdef CC3XX_CONFIG_HASH_SHA224_ENABLE
