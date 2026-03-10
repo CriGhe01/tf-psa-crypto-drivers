@@ -90,3 +90,11 @@ target_link_libraries(${CC3XX_TARGET_NAME}
     PUBLIC
         $<$<STREQUAL:${CC3XX_LOG_TYPE},TFM>:tfm_log_headers>
 )
+
+if(DEFINED CC3XX_CONFIG_FILE)
+    message(STATUS "${CC3XX_TARGET_NAME} using -DCC3XX_CONFIG_FILE=\"${CC3XX_CONFIG_FILE}\"")
+    target_compile_definitions(${CC3XX_TARGET_NAME}
+        PUBLIC
+            CC3XX_CONFIG_FILE="${CC3XX_CONFIG_FILE}"
+    )
+endif()
