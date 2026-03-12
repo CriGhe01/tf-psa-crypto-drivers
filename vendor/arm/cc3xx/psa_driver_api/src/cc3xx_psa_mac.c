@@ -314,7 +314,7 @@ static psa_status_t mac_setup(cc3xx_mac_operation_t *operation,
 
     CC3XX_ASSERT(operation != NULL);
     CC3XX_ASSERT(attributes != NULL);
-    CC3XX_ASSERT(!key_buffer_size ^ (key_buffer != NULL));
+    CC3XX_ASSERT(!key_buffer_size == !key_buffer);
 
 #if defined(PSA_WANT_ALG_CMAC)
     if (PSA_ALG_FULL_LENGTH_MAC(alg) == PSA_ALG_CMAC) {
