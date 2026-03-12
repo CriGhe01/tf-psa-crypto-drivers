@@ -42,7 +42,7 @@ static psa_status_t psa_to_cc3xx_hash_alg_and_size(psa_algorithm_t alg,
                                                    cc3xx_hash_alg_t *hash_alg,
                                                    size_t *hash_length)
 {
-    psa_status_t status = PSA_SUCCESS;
+    psa_status_t status;
     size_t cc3xx_length;
 
     assert(hash_alg != NULL);
@@ -52,18 +52,21 @@ static psa_status_t psa_to_cc3xx_hash_alg_and_size(psa_algorithm_t alg,
     case PSA_ALG_SHA_1:
         *hash_alg = CC3XX_HASH_ALG_SHA1;
         cc3xx_length = SHA1_OUTPUT_SIZE;
+        status = PSA_SUCCESS;
         break;
 #endif /* PSA_WANT_ALG_SHA_1 */
 #if defined(PSA_WANT_ALG_SHA_224)
     case PSA_ALG_SHA_224:
         *hash_alg = CC3XX_HASH_ALG_SHA224;
         cc3xx_length = SHA224_OUTPUT_SIZE;
+        status = PSA_SUCCESS;
         break;
 #endif /* PSA_WANT_ALG_SHA_224 */
 #if defined(PSA_WANT_ALG_SHA_256)
     case PSA_ALG_SHA_256:
         *hash_alg = CC3XX_HASH_ALG_SHA256;
         cc3xx_length = SHA256_OUTPUT_SIZE;
+        status = PSA_SUCCESS;
         break;
 #endif /* PSA_WANT_ALG_SHA_256 */
 #if defined(PSA_WANT_ALG_SHA_384)
@@ -73,6 +76,7 @@ static psa_status_t psa_to_cc3xx_hash_alg_and_size(psa_algorithm_t alg,
     case PSA_ALG_SHA_512:
 #endif /* PSA_WANT_ALG_SHA_512 */
     default:
+        *hash_alg = CC3XX_HASH_ALG_INVALID;
         cc3xx_length = 0;
         status = PSA_ERROR_NOT_SUPPORTED;
     }

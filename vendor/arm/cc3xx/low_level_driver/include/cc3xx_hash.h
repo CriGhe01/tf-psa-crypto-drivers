@@ -19,9 +19,11 @@
 #define SHA256_OUTPUT_SIZE (32)
 
 typedef enum {
-    CC3XX_HASH_ALG_SHA1  =  0b0001U,
-    CC3XX_HASH_ALG_SHA224 = 0b1010U,
-    CC3XX_HASH_ALG_SHA256 = 0b0010U,
+    CC3XX_HASH_ALG_SHA1    = 0b0001U,
+    CC3XX_HASH_ALG_SHA224  = 0b1010U,
+    CC3XX_HASH_ALG_SHA256  = 0b0010U,
+    /* Force enum to be always on 4-bytes */
+    CC3XX_HASH_ALG_INVALID = UINT32_MAX
 } cc3xx_hash_alg_t;
 
 /**
