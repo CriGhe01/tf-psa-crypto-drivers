@@ -299,7 +299,7 @@ cc3xx_err_t cc3xx_lowlevel_chacha20_update(const uint8_t* in, size_t in_len)
 }
 
 #if defined(CC3XX_CONFIG_CHACHA_POLY1305_ENABLE)
-static cc3xx_err_t tag_cmp_or_copy(uint32_t *tag, uint32_t *calculated_tag)
+static cc3xx_err_t tag_cmp_or_copy(uint32_t *tag, const uint32_t *calculated_tag)
 {
     uint32_t idx;
     uint32_t tag_word_size = POLY1305_TAG_LEN / sizeof(uint32_t);
