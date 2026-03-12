@@ -117,11 +117,11 @@ static void setup_ahbm(void)
     P_CC3XX->misc.dma_clk_enable = 0x0U;
 }
 
-static cc3xx_err_t setup_dfa_countermeasures(void)
+void setup_dfa_countermeasures(void)
 {
 #ifdef CC3XX_CONFIG_HW_VERSION_CC310
     /* CC310 has no AO interface where DFA could be disabled */
-    return CC3XX_ERR_SUCCESS;
+    return;
 #endif /* CC3XX_CONFIG_HW_VERSION_CC310 */
 
 #ifdef CC3XX_CONFIG_DFA_MITIGATIONS_ENABLE
@@ -150,8 +150,6 @@ static cc3xx_err_t setup_dfa_countermeasures(void)
         P_CC3XX->ao.host_ao_lock_bits &= ~(0b1U << 7); /* Unset HOST_FORCE_DFA_ENABLE */
     }
     P_CC3XX->ao.host_ao_lock_bits |= 0b1U << 8; /* Set HOST_DFA_ENABLE_LOCK */
-
-    return CC3XX_ERR_SUCCESS;
 }
 
 #ifdef CC3XX_CONFIG_DPA_MITIGATIONS_ENABLE
@@ -222,10 +220,8 @@ cc3xx_err_t cc3xx_lowlevel_init(void)
     /* Setup AHB5 Manager Interface */
     setup_ahbm();
 
-    err = setup_dfa_countermeasures();
-    if (err != CC3XX_ERR_SUCCESS) {
-        return err;
-    }
+    /* Setup DFA countermeasures if the HW supports them */
+    setup_dfa_countermeasures();
 
 #ifdef CC3XX_CONFIG_DPA_MITIGATIONS_ENABLE
     err = setup_dpa_countermeasures();
