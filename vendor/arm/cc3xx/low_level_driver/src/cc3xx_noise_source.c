@@ -325,14 +325,14 @@ void cc3xx_lowlevel_noise_source_context_init(struct cc3xx_noise_source_ctx_t *c
     };
 }
 #else
-void cc3xx_lowlevel_noise_source_context_init(struct cc3xx_noise_source_ctx_t *ctx)
+void cc3xx_lowlevel_noise_source_context_init(const struct cc3xx_noise_source_ctx_t *ctx)
 {
     (void)ctx;
 }
 #endif /* CC3XX_CONFIG_RNG_EXTERNAL_TRNG */
 
 #ifndef CC3XX_CONFIG_RNG_EXTERNAL_TRNG
-cc3xx_err_t cc3xx_lowlevel_noise_source_init(struct cc3xx_noise_source_ctx_t *ctx)
+cc3xx_err_t cc3xx_lowlevel_noise_source_init(const struct cc3xx_noise_source_ctx_t *ctx)
 {
     assert(ctx != NULL);
     if (!(ctx->is_config_valid)) {

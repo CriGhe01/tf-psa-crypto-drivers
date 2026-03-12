@@ -209,11 +209,11 @@ void cc3xx_lowlevel_noise_source_set_hw_test_bypass(
  * @brief                       Initialises the TRNG before a call to \a cc3xx_lowlevel_noise_source_get_sample.
  *                              It requires a pointer to a context to be passed in
  *
- * @param[in, out] ctx          Pointer to the context to use for the initialisation
+ * @param[in] ctx               Pointer to the context to use for the initialisation
  *
  * @return cc3xx_err_t          CC3XX_ERR_SUCCESS
  */
-cc3xx_err_t cc3xx_lowlevel_noise_source_init(struct cc3xx_noise_source_ctx_t *ctx);
+cc3xx_err_t cc3xx_lowlevel_noise_source_init(const struct cc3xx_noise_source_ctx_t *ctx);
 
 /**
  * @brief                       Reads the sample out of the TRNG
