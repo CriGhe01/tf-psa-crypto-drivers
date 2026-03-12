@@ -59,15 +59,11 @@ static uint64_t get_ctr(void)
 
 static inline void set_key(const uint32_t *key)
 {
-    size_t idx;
-
 #ifdef CC3XX_CONFIG_DPA_MITIGATIONS_ENABLE
-    (void)idx;
-
     cc3xx_dpa_hardened_word_copy(P_CC3XX->chacha.chacha_key, key, 7);
     P_CC3XX->chacha.chacha_key[7] = key[7];
 #else
-    for (idx = 0; idx < 8; idx++) {
+    for (size_t idx = 0; idx < 8; idx++) {
         P_CC3XX->chacha.chacha_key[idx] = key[idx];
     }
 #endif /* CC3XX_CONFIG_DPA_MITIGATIONS_ENABLE */
@@ -115,7 +111,6 @@ cc3xx_err_t cc3xx_lowlevel_chacha20_init(
     uint64_t initial_counter,
     const uint32_t *iv, size_t iv_len)
 {
-    uint32_t idx;
 #if defined(CC3XX_CONFIG_CHACHA_POLY1305_ENABLE)
     uint32_t poly_key[CC3XX_CHACHA_BLOCK_SIZE / sizeof(uint32_t)] = {0};
 
@@ -136,11 +131,9 @@ cc3xx_err_t cc3xx_lowlevel_chacha20_init(
     }
 
 #ifdef CC3XX_CONFIG_DPA_MITIGATIONS_ENABLE
-    (void)idx;
-
     cc3xx_dpa_hardened_word_copy(chacha_state.key, key, 8);
 #else
-    for (idx = 0; idx < 8; idx++) {
+    for (size_t idx = 0; idx < 8; idx++) {
         chacha_state.key[idx] = key[idx];
     }
 #endif /* CC3XX_CONFIG_DPA_MITIGATIONS_ENABLE */
