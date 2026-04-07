@@ -483,7 +483,6 @@ static psa_status_t cc3xx_aead_ccm_ctr_update(
         size_t *output_length,
         size_t block_buf_size_in_use)
 {
-        psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
         cc3xx_err_t err;
         struct cc3xx_aes_state_t *state = &operation->aes;
         size_t processed_bytes = 0;
@@ -548,7 +547,7 @@ static psa_status_t cc3xx_aead_ccm_ctr_update(
         *output_length += processed_bytes;
 
         if (counter_incr_val > 0) {
-            c3xx_lowlevel_aes_ccm_incr_ctr(state->ctr, counter_incr_val);
+            c3xx_lowlevel_aes_ccm_incr_ctr((uint8_t *)state->ctr, counter_incr_val);
         }
 
         return PSA_SUCCESS;
