@@ -14,50 +14,35 @@
 #include "cc3xx_rng.h"
 #include "cc3xx_stdlib.h"
 
-static void long_inc_int(uint32_t *acc, size_t acc_size, bool is_increment)
+static inline void long_dec(uint32_t acc32[4])
 {
-    const bool pka_initialized = cc3xx_lowlevel_pka_is_initialized();
-    cc3xx_pka_reg_id_t r0;
+    uint8_t *acc = (uint8_t *)acc32;
+    uint16_t borrow = 1;
 
-    assert(acc_size == CC3XX_DRBG_CTR_BLOCKLEN);
-
-    if (!pka_initialized) {
-        /* Accumulation happen only on 128 bit accumulators */
-        cc3xx_lowlevel_pka_init(CC3XX_DRBG_CTR_BLOCKLEN);
-    }
-
-    /* Allocate a register among those not in use, given configured size */
-    r0 = cc3xx_lowlevel_pka_allocate_reg();
-
-    /* Initialize the accumulator register with the current value of acc */
-    cc3xx_lowlevel_pka_write_reg_swap_endian(r0, (const uint32_t *)acc, CC3XX_DRBG_CTR_BLOCKLEN);
-
-    /* Perform the actual operation */
-    if (is_increment) {
-        cc3xx_lowlevel_pka_add_si(r0, 1, r0);
-    } else {
-        cc3xx_lowlevel_pka_sub_si(r0, 1, r0);
-    }
-
-    /* Read back the accumulator register */
-    cc3xx_lowlevel_pka_read_reg_swap_endian(r0, acc, CC3XX_DRBG_CTR_BLOCKLEN);
-
-    cc3xx_lowlevel_pka_free_reg(r0);
-
-    if (!pka_initialized) {
-        /* Uninit the engine */
-        cc3xx_lowlevel_pka_uninit();
+    size_t i = 4 * sizeof(uint32_t);
+    while (i > 0)
+    {
+        i--;
+        /* Underflows to 0xFFFF when acc[i] is 0x00 */
+        borrow = (uint16_t)acc[i] - borrow;
+        acc[i] = (uint8_t)borrow;
+        borrow = (borrow >> 15) & 1;
     }
 }
 
-static inline void long_inc(uint32_t *acc, size_t acc_size)
+static inline void long_inc(uint32_t acc32[4])
 {
-    long_inc_int(acc, acc_size, true);
-}
+    uint8_t *acc = (uint8_t *)acc32;
+    uint16_t carry = 1;
+    size_t acc_size = 4 * sizeof(uint32_t);
 
-static inline void long_dec(uint32_t *acc, size_t acc_size)
-{
-    long_inc_int(acc, acc_size, false);
+    while (acc_size > 0)
+    {
+        acc_size--;
+        carry = (uint16_t)acc[acc_size] + carry;
+        acc[acc_size] = (uint8_t)carry;
+        carry >>= 8;
+    }
 }
 
 /**
@@ -78,7 +63,7 @@ static cc3xx_err_t cc3xx_drbg_ctr_update(
     cc3xx_err_t err;
     assert(data_len <= CC3XX_DRBG_CTR_SEEDLEN);
 
-    long_inc((uint32_t *)state->block_v, sizeof(state->block_v));
+    long_inc((uint32_t *)state->block_v);
 
     err = cc3xx_lowlevel_aes_init(CC3XX_AES_DIRECTION_ENCRYPT,
                                   CC3XX_AES_MODE_CTR,
@@ -209,7 +194,7 @@ cc3xx_err_t cc3xx_lowlevel_drbg_ctr_generate(
         p_additional_input = additional_input;
     }
 
-    long_inc((uint32_t *)state->block_v, sizeof(state->block_v));
+    long_inc((uint32_t *)state->block_v);
 
     err = cc3xx_lowlevel_aes_init(CC3XX_AES_DIRECTION_ENCRYPT,
                                   CC3XX_AES_MODE_CTR,
@@ -257,7 +242,7 @@ cc3xx_err_t cc3xx_lowlevel_drbg_ctr_generate(
 #else
     memcpy(state->block_v, aes_state.ctr, sizeof(state->block_v));
 #endif
-    long_dec((uint32_t *)state->block_v, sizeof(state->block_v));
+    long_dec((uint32_t *)state->block_v);
 
     /* Update for back tracking resistance */
     err = cc3xx_drbg_ctr_update(state, p_additional_input, CC3XX_DRBG_CTR_SEEDLEN);
