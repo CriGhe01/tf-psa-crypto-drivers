@@ -69,7 +69,6 @@ bool cc3xx_lowlevel_ec_weierstrass_validate_point(const cc3xx_ec_curve_t *curve,
                                                                      curve->order,
                                                                      &foo);
         if (err != CC3XX_ERR_EC_POINT_IS_INFINITY) {
-            FATAL_ERR(false);
             validate_succeeded = false;
         }
     }
