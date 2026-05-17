@@ -592,8 +592,6 @@ psa_status_t cc3xx_aead_update(
     if (ctr_required) {
         ctr_block_buf_size_in_use = (operation->aes.crypted_length > 0) ?
                                     operation->aes.dma_state.block_buf_size_in_use : 0;
-        memcpy(ccm_ctr, operation->aes.ctr, sizeof(ccm_ctr));
-
         if (operation->aes.direction == CC3XX_AES_DIRECTION_DECRYPT) {
             status = cc3xx_aead_ccm_ctr_update(operation,
                                                input,
@@ -608,8 +606,9 @@ psa_status_t cc3xx_aead_update(
 
             /* CBC-MAC computes the tag on plaintext data */
             input = output;
-            memcpy(ccm_ctr, operation->aes.ctr, sizeof(ccm_ctr));
         }
+
+        memcpy(ccm_ctr, operation->aes.ctr, sizeof(ccm_ctr));
     }
 #endif /* !CC3XX_CONFIG_AES_TUNNELLING_ENABLE && PSA_WANT_ALG_CCM */
 
