@@ -43,50 +43,50 @@ cc3xx_ec_curve_id_t cc3xx_to_curve_id(psa_ecc_family_t psa_ecc_family, psa_key_b
     case PSA_ECC_FAMILY_SECP_R1:
     {
         switch (key_bits) {
-            case 192:
-                return CC3XX_EC_CURVE_SECP_192_R1;
-            case 224:
-                return CC3XX_EC_CURVE_SECP_224_R1;
-            case 256:
-                return CC3XX_EC_CURVE_SECP_256_R1;
-            case 384:
-                return CC3XX_EC_CURVE_SECP_384_R1;
-            case 521:
-                return CC3XX_EC_CURVE_SECP_521_R1;
-            default:
-                return _CURVE_ID_MAX; /* Use the Maximum value as invalid */
+        case 192:
+            return CC3XX_EC_CURVE_SECP_192_R1;
+        case 224:
+            return CC3XX_EC_CURVE_SECP_224_R1;
+        case 256:
+            return CC3XX_EC_CURVE_SECP_256_R1;
+        case 384:
+            return CC3XX_EC_CURVE_SECP_384_R1;
+        case 521:
+            return CC3XX_EC_CURVE_SECP_521_R1;
+        default:
+            return _CURVE_ID_MAX; /* Use the Maximum value as invalid */
         }
     }
     case PSA_ECC_FAMILY_SECP_K1:
     {
         switch (key_bits) {
-            case 192:
-                return CC3XX_EC_CURVE_SECP_192_K1;
-            case 224:
-                return CC3XX_EC_CURVE_SECP_224_K1;
-            case 256:
-                return CC3XX_EC_CURVE_SECP_256_K1;
-            default:
-                return _CURVE_ID_MAX; /* Use the Maximum value as invalid */
+        case 192:
+            return CC3XX_EC_CURVE_SECP_192_K1;
+        case 224:
+            return CC3XX_EC_CURVE_SECP_224_K1;
+        case 256:
+            return CC3XX_EC_CURVE_SECP_256_K1;
+        default:
+            return _CURVE_ID_MAX; /* Use the Maximum value as invalid */
         }
     }
     case PSA_ECC_FAMILY_BRAINPOOL_P_R1:
     {
         switch (key_bits) {
-            case 192:
-                return CC3XX_EC_CURVE_BRAINPOOLP_192_R1;
-            case 224:
-                return CC3XX_EC_CURVE_BRAINPOOLP_224_R1;
-            case 256:
-                return CC3XX_EC_CURVE_BRAINPOOLP_256_R1;
-            case 320:
-                return CC3XX_EC_CURVE_BRAINPOOLP_320_R1;
-            case 384:
-                return CC3XX_EC_CURVE_BRAINPOOLP_384_R1;
-            case 512:
-                return CC3XX_EC_CURVE_BRAINPOOLP_512_R1;
-            default:
-                return _CURVE_ID_MAX; /* Use the Maximum value as invalid */
+        case 192:
+            return CC3XX_EC_CURVE_BRAINPOOLP_192_R1;
+        case 224:
+            return CC3XX_EC_CURVE_BRAINPOOLP_224_R1;
+        case 256:
+            return CC3XX_EC_CURVE_BRAINPOOLP_256_R1;
+        case 320:
+            return CC3XX_EC_CURVE_BRAINPOOLP_320_R1;
+        case 384:
+            return CC3XX_EC_CURVE_BRAINPOOLP_384_R1;
+        case 512:
+            return CC3XX_EC_CURVE_BRAINPOOLP_512_R1;
+        default:
+            return _CURVE_ID_MAX; /* Use the Maximum value as invalid */
         }
     }
     default:
