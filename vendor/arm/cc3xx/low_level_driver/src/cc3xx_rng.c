@@ -96,21 +96,31 @@ typedef struct {
 
 static xorshift_plus_128_state_t g_lfsr = {.seed_done = false};
 
-static inline void lfsr_seed(xorshift_plus_128_state_t *lfsr)
+static inline cc3xx_err_t lfsr_seed(xorshift_plus_128_state_t *lfsr)
 {
+    cc3xx_err_t err;
+
     if (!lfsr->seed_done) {
-        while (cc3xx_lowlevel_get_entropy(
-                    lfsr->entropy, sizeof(lfsr->entropy)) != CC3XX_ERR_SUCCESS);
+        err = cc3xx_lowlevel_get_entropy(lfsr->entropy, sizeof(lfsr->entropy));
+        if (err != CC3XX_ERR_SUCCESS) {
+            return err;
+        }
         lfsr->seed_done = true;
     }
+
+    return CC3XX_ERR_SUCCESS;
 }
 
 /* See https://en.wikipedia.org/wiki/Xorshift#xorshift+ */
-static uint64_t xorshift_plus_128_lfsr(xorshift_plus_128_state_t *lfsr)
+static cc3xx_err_t xorshift_plus_128_lfsr(xorshift_plus_128_state_t *lfsr, uint64_t *random)
 {
     uint64_t temp0, temp1;
+    cc3xx_err_t err;
 
-    lfsr_seed(lfsr);
+    err = lfsr_seed(lfsr);
+    if (err != CC3XX_ERR_SUCCESS) {
+        return err;
+    }
 
     temp0 = lfsr->state[0];
     temp1 = lfsr->state[1];
@@ -122,7 +132,9 @@ static uint64_t xorshift_plus_128_lfsr(xorshift_plus_128_state_t *lfsr)
 
     lfsr->state[1] = temp0;
 
-    return temp0 + temp1;
+    *random = temp0 + temp1;
+
+    return CC3XX_ERR_SUCCESS;
 }
 
 static cc3xx_err_t drbg_get_random(uint8_t *buf, size_t length)
@@ -133,8 +145,10 @@ static cc3xx_err_t drbg_get_random(uint8_t *buf, size_t length)
     if (!g_drbg.seed_done) {
 
         /* Get entropy to initialize DRBG state */
-        while (cc3xx_lowlevel_get_entropy(
-                    entropy, sizeof(entropy)) != CC3XX_ERR_SUCCESS);
+        err = cc3xx_lowlevel_get_entropy(entropy, sizeof(entropy));
+        if (err != CC3XX_ERR_SUCCESS) {
+            return err;
+        }
 
         /* Call the seeding API of the desired drbg */
         err = g_drbg.init(&g_drbg.state,
@@ -153,8 +167,10 @@ static cc3xx_err_t drbg_get_random(uint8_t *buf, size_t length)
     if (g_drbg.state.reseed_counter == UINT32_MAX) {
 
         /* Get entropy to re-seed DRBG state */
-        while (cc3xx_lowlevel_get_entropy(
-                    entropy, sizeof(entropy)) != CC3XX_ERR_SUCCESS);
+        err = cc3xx_lowlevel_get_entropy(entropy, sizeof(entropy));
+        if (err != CC3XX_ERR_SUCCESS) {
+            return err;
+        }
 
         err = g_drbg.reseed(&g_drbg.state,
                     (const uint8_t *)entropy, g_drbg.entropy_size, NULL, 0);
@@ -232,6 +248,8 @@ static void lfsr_dword_memcpy(void *dst, const uint64_t *src, size_t len)
 cc3xx_err_t cc3xx_lowlevel_rng_get_random(uint8_t *buf, size_t length,
                                           enum cc3xx_rng_quality_t quality)
 {
+    cc3xx_err_t err;
+
     if (buf == NULL) {
         if (length) {
             FATAL_ERR(CC3XX_ERR_INVALID_INPUT_LENGTH);
@@ -244,8 +262,14 @@ cc3xx_err_t cc3xx_lowlevel_rng_get_random(uint8_t *buf, size_t length,
     case CC3XX_RNG_LFSR:
         while (length) {
             /* Generate 8 random bytes through the LFSR and check how many need copying */
-            const uint64_t random = xorshift_plus_128_lfsr(&g_lfsr);
+            uint64_t random;
             const size_t len_to_copy = length > sizeof(uint64_t) ? sizeof(random) : length;
+
+            err = xorshift_plus_128_lfsr(&g_lfsr, &random);
+            if (err != CC3XX_ERR_SUCCESS) {
+                return err;
+            }
+
             /* Copy the bytes taking alignment contraints in consideration */
             lfsr_dword_memcpy(buf, &random, len_to_copy);
             /* Decrease the length counter until we have copied all the bytes requested */
